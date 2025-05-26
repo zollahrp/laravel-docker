@@ -10,8 +10,21 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Node.js & npm
+# Install Node.js & npm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
+# Install pnpm
+RUN npm install -g pnpm
+
+# Set working directory
 WORKDIR /var/www/html
+
+# Copy project files (pastikan Dockerfile berada di root project)
+COPY . .
+
+# Install PHP dependencies via Composer
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Install JS dependencies via pnpm
+RUN pnpm install
